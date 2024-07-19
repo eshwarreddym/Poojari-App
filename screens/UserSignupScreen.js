@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,8 +9,10 @@ const UserSignupScreen = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSignup = async () => {
+        setLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
@@ -25,6 +27,8 @@ const UserSignupScreen = ({ navigation }) => {
             navigation.navigate('HomeScreen');
         } catch (error) {
             setErrorMessage(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -53,9 +57,13 @@ const UserSignupScreen = ({ navigation }) => {
                 placeholderTextColor="#888" // Placeholder text color
             />
             {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-            <TouchableOpacity style={styles.button} onPress={handleSignup}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
+            {loading ? (
+                <ActivityIndicator size="large" color="#ff6f00" />
+            ) : (
+                <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
@@ -95,4 +103,3 @@ const styles = StyleSheet.create({
 });
 
 export default UserSignupScreen;
-

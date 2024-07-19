@@ -11,7 +11,7 @@ const PanditLoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('PanditBookingsScreen');
+      navigation.navigate('PanditDashboardScreen'); // Changed from PanditBookingsScreen
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -19,21 +19,21 @@ const PanditLoginScreen = ({ navigation }) => {
 
   return (
       <ImageBackground
-          source={require('../assets/images/Pandit.jpg')} // Replace with your image path
+          source={require('../assets/images/Pandit.jpg')}
           style={styles.background}
       >
         <View style={styles.container}>
           <TextInput
               style={styles.input}
               placeholder="Email"
-              placeholderTextColor="#666" // Dark placeholder text
+              placeholderTextColor="#666"
               onChangeText={setEmail}
               value={email}
           />
           <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#666" // Dark placeholder text
+              placeholderTextColor="#666"
               onChangeText={setPassword}
               value={password}
               secureTextEntry

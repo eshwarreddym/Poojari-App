@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, ImageBackground, Button } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,6 +9,7 @@ const PanditSignupScreen = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [location, setLocation] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleSignup = async () => {
@@ -21,10 +22,12 @@ const PanditSignupScreen = ({ navigation }) => {
                 name: name,
                 email: email,
                 location: location,
-                role: 'pandit'
+                phoneNumber: phoneNumber,
+                role: 'pandit',
+                availableDates: [] // Initialize with an empty array
             });
 
-            navigation.navigate('PanditBookingsScreen');
+            navigation.navigate('PanditDashboardScreen');
         } catch (error) {
             setErrorMessage(error.message);
         }
@@ -32,28 +35,28 @@ const PanditSignupScreen = ({ navigation }) => {
 
     return (
         <ImageBackground
-            source={require('../assets/images/Pandit.jpg')} // Replace with your image path
+            source={require('../assets/images/Pandit.jpg')}
             style={styles.background}
         >
             <View style={styles.container}>
                 <TextInput
                     style={styles.input}
                     placeholder="Name"
-                    placeholderTextColor="#666" // Dark placeholder text
+                    placeholderTextColor="#666"
                     onChangeText={setName}
                     value={name}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Email"
-                    placeholderTextColor="#666" // Dark placeholder text
+                    placeholderTextColor="#666"
                     onChangeText={setEmail}
                     value={email}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
-                    placeholderTextColor="#666" // Dark placeholder text
+                    placeholderTextColor="#666"
                     onChangeText={setPassword}
                     value={password}
                     secureTextEntry
@@ -61,9 +64,16 @@ const PanditSignupScreen = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder="Location"
-                    placeholderTextColor="#666" // Dark placeholder text
+                    placeholderTextColor="#666"
                     onChangeText={setLocation}
                     value={location}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Phone Number"
+                    placeholderTextColor="#666"
+                    onChangeText={setPhoneNumber}
+                    value={phoneNumber}
                 />
                 {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
                 <TouchableOpacity style={styles.button} onPress={handleSignup}>
@@ -119,4 +129,3 @@ const styles = StyleSheet.create({
 });
 
 export default PanditSignupScreen;
-

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Button, ActivityIndicator } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 
@@ -7,13 +7,17 @@ const UserLoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigation.navigate('HomeScreen');
     } catch (error) {
       setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,7 +37,11 @@ const UserLoginScreen = ({ navigation }) => {
             secureTextEntry
         />
         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-        <Button title="Login" onPress={handleLogin} />
+        {loading ? (
+            <ActivityIndicator size="large" color="#ff6f00" />
+        ) : (
+            <Button title="Login" onPress={handleLogin} />
+        )}
         <TouchableOpacity onPress={() => navigation.navigate('ResetPasswordScreen')}>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>

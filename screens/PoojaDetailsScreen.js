@@ -1,3 +1,4 @@
+// PoojaDetailsScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
@@ -34,7 +35,7 @@ const PoojaDetailsScreen = ({ route, navigation }) => {
               />
               <Button
                   title="Book Now"
-                  onPress={() => navigation.navigate('BookingScreen', { poojaId })}
+                  onPress={() => navigation.navigate('BookingScreen', { poojaId, poojaName: pooja.name })}
               />
             </>
         )}
@@ -46,24 +47,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#fafafa',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#ff6f00',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#333',
   },
   item: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 4,
+    color: '#555',
   },
 });
 
 export default PoojaDetailsScreen;
-
