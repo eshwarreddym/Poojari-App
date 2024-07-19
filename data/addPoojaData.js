@@ -14,6 +14,13 @@
 //             ]
 //         },
 //         {
+//             name: "Marriage ",
+//             items: ["Turmeric (Haldi)","Kumkum","Coconut","Rice","Sandalwood paste"," Flowers","Betel leaves and nuts",
+//             "Sweets","Ghee","Fruits","Dry fruits and nuts","Clothing and Jewelry","Milk and Honey",
+//                 "Coins","Sacred thread (Mangalsutra)","Water (Jal)","Fire (Agni)","Oil lamps (Diyas)","Rangoli"
+//                 ]
+//         },
+//         {
 //             name: "Satyanarayan Pooja",
 //             items: [
 //                 "Panchamrit", "Flowers", "Tulsi leaves", "Betel leaves", "Betel nuts",

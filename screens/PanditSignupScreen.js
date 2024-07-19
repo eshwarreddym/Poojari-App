@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -31,47 +31,62 @@ const PanditSignupScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <TextInput
-                style={styles.input}
-                placeholder="Name"
-                onChangeText={setName}
-                value={name}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                onChangeText={setEmail}
-                value={email}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                onChangeText={setPassword}
-                value={password}
-                secureTextEntry
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Location"
-                onChangeText={setLocation}
-                value={location}
-            />
-            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-            <TouchableOpacity style={styles.button} onPress={handleSignup}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-        </View>
+        <ImageBackground
+            source={require('../assets/images/Pandit.jpg')} // Replace with your image path
+            style={styles.background}
+        >
+            <View style={styles.container}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Name"
+                    placeholderTextColor="#666" // Dark placeholder text
+                    onChangeText={setName}
+                    value={name}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="#666" // Dark placeholder text
+                    onChangeText={setEmail}
+                    value={email}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="#666" // Dark placeholder text
+                    onChangeText={setPassword}
+                    value={password}
+                    secureTextEntry
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Location"
+                    placeholderTextColor="#666" // Dark placeholder text
+                    onChangeText={setLocation}
+                    value={location}
+                />
+                {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+                <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    background: {
         flex: 1,
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    container: {
+        width: '80%',
         padding: 16,
-        backgroundColor: '#fafafa', // Soft gray background
+        borderRadius: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent background for better readability
     },
     input: {
         width: '100%',
@@ -80,6 +95,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ff6f00', // Orange border color
         borderRadius: 4,
+        backgroundColor: '#fff', // White background for input fields
+        color: '#000', // Dark text color for input fields
     },
     error: {
         color: '#ff6f00', // Orange color for error message
