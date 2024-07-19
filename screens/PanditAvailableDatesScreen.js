@@ -16,7 +16,10 @@ const PanditAvailableDatesScreen = () => {
         const panditRef = doc(db, "pandits", auth.currentUser.uid);
         const panditSnap = await getDoc(panditRef);
         if (panditSnap.exists()) {
-            setAvailableDates(panditSnap.data().availableDates || []);
+            const dates = panditSnap.data().availableDates || [];
+            // Convert Firestore Timestamps to JavaScript Date objects
+            const datesArray = dates.map(timestamp => timestamp.toDate());
+            setAvailableDates(datesArray);
         }
     };
 
@@ -29,8 +32,19 @@ const PanditAvailableDatesScreen = () => {
 
     const saveAvailableDates = async () => {
         const panditRef = doc(db, "pandits", auth.currentUser.uid);
-        await updateDoc(panditRef, { availableDates: availableDates });
-        alert('Available dates saved successfully!');
+
+        // Convert JavaScript Date objects to Firestore Timestamps
+        const datesTimestamps = availableDates.map(date => {
+            return new Date(date); // Convert Date to Firestore Timestamp
+        });
+
+        try {
+            await updateDoc(panditRef, { availableDates: datesTimestamps });
+            alert('Available dates saved successfully!');
+        } catch (error) {
+            console.error("Error updating document:", error);
+            alert('Failed to save available dates. Please try again.');
+        }
     };
 
     return (
@@ -39,7 +53,7 @@ const PanditAvailableDatesScreen = () => {
             <FlatList
                 data={availableDates}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text style={styles.dateItem}>{item.toDate().toDateString()}</Text>}
+                renderItem={({ item }) => <Text style={styles.dateItem}>{item.toDateString()}</Text>}
             />
             <Button title="Add Available Date" onPress={() => setShowDatePicker(true)} />
             {showDatePicker && (

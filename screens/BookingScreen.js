@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, Alert, FlatList } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { collection, addDoc, updateDoc, doc, getDoc, arrayRemove } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
+import { collection, addDoc, updateDoc, doc, getDocs, getDoc } from 'firebase/firestore';
+import { auth, db, FieldValue } from '../firebaseConfig'; // Ensure FieldValue is imported correctly
 
 const BookingScreen = ({ route, navigation }) => {
     const { poojaId, panditId } = route.params;
@@ -36,14 +36,23 @@ const BookingScreen = ({ route, navigation }) => {
     }, [poojaId, panditId]);
 
     const fetchAvailableDates = async (selectedPanditId) => {
-        const panditRef = doc(db, 'pandits', selectedPanditId);
-        const panditSnap = await getDoc(panditRef);
-        if (panditSnap.exists()) {
-            const panditData = panditSnap.data();
-            const dates = panditData.availableDates || [];
-            // Filter out past dates
-            const filteredDates = dates.filter(date => new Date(date.toDate()) > new Date());
-            setAvailableDates(filteredDates);
+        try {
+            const panditRef = doc(db, 'pandits', selectedPanditId);
+            const panditSnap = await getDoc(panditRef);
+            if (panditSnap.exists()) {
+                const panditData = panditSnap.data();
+                const dates = panditData.availableDates || [];
+                // Filter out past dates
+                const filteredDates = dates.filter(date => new Date(date.toDate()) > new Date());
+                setAvailableDates(filteredDates);
+                // Clear selected date and time slots when dates are fetched
+                setSelectedDate(null);
+                setSelectedTime(null);
+            } else {
+                console.log('Pandit document not found');
+            }
+        } catch (error) {
+            console.error('Error fetching available dates:', error);
         }
     };
 
@@ -57,6 +66,7 @@ const BookingScreen = ({ route, navigation }) => {
         // Here you would typically fetch available time slots for the selected date
         // For this example, we'll use dummy time slots
         setAvailableTimeSlots(['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM']);
+        setSelectedTime(null); // Clear selected time when a new date is selected
     };
 
     const handleBooking = async () => {
@@ -80,7 +90,7 @@ const BookingScreen = ({ route, navigation }) => {
             // Update pandit's availability
             const panditRef = doc(db, 'pandits', selectedPandit);
             await updateDoc(panditRef, {
-                availableDates: arrayRemove(selectedDate)
+                availableDates: FieldValue.arrayRemove(selectedDate)
             });
 
             Alert.alert('Success', 'Booking successful! Booking ID: ' + newBookingRef.id);
@@ -142,6 +152,7 @@ const BookingScreen = ({ route, navigation }) => {
                             <Button
                                 title={item}
                                 onPress={() => setSelectedTime(item)}
+                                color={selectedTime === item ? 'blue' : 'black'}
                             />
                         )}
                     />
