@@ -11,14 +11,16 @@
 //                 "Incense sticks", "Flowers", "Ghee", "Diyas (lamps)",
 //                 "Panchamrit (milk, curd, honey, sugar, ghee)", "Navagraha idols or pictures",
 //                 "Coconut", "Fruits and sweets"
-//             ]
+//             ],
+//             image: "griha_pravesh.jpg" // Changed from .png to .jpg
 //         },
 //         {
-//             name: "Marriage ",
+//             name: "Marriage",
 //             items: ["Turmeric (Haldi)","Kumkum","Coconut","Rice","Sandalwood paste"," Flowers","Betel leaves and nuts",
-//             "Sweets","Ghee","Fruits","Dry fruits and nuts","Clothing and Jewelry","Milk and Honey",
+//                 "Sweets","Ghee","Fruits","Dry fruits and nuts","Clothing and Jewelry","Milk and Honey",
 //                 "Coins","Sacred thread (Mangalsutra)","Water (Jal)","Fire (Agni)","Oil lamps (Diyas)","Rangoli"
-//                 ]
+//             ],
+//             image: "marriage.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Satyanarayan Pooja",
@@ -27,7 +29,8 @@
 //                 "Fruits", "Sweets (especially Sooji Halwa)", "Incense sticks", "Camphor",
 //                 "Ghee", "Diyas", "Rice", "Haldi and Kumkum", "Kalash", "Mango leaves",
 //                 "Coconut", "Red cloth"
-//             ]
+//             ],
+//             image: "satyanarayan.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Lakshmi Pooja (Diwali)",
@@ -36,7 +39,8 @@
 //                 "Betel leaves", "Betel nuts", "Incense sticks", "Camphor", "Ghee", "Diyas",
 //                 "Kumkum", "Haldi", "Rice", "Fruits", "Sweets", "Coins", "Red cloth",
 //                 "Mango leaves", "Kalash", "Panchamrit", "Coconuts"
-//             ]
+//             ],
+//             image: "lakshmi_pooja.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Ganesh Pooja",
@@ -45,7 +49,8 @@
 //                 "Camphor", "Ghee", "Diyas", "Flowers (especially red flowers)", "Haldi",
 //                 "Kumkum", "Rice", "Fruits (especially bananas)", "Sweets (especially Modaks)",
 //                 "Panchamrit", "Mango leaves", "Kalash", "Red cloth"
-//             ]
+//             ],
+//             image: "ganesh_pooja.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Navagraha Pooja",
@@ -54,7 +59,8 @@
 //                 "Flowers", "Fruits", "Incense sticks", "Camphor", "Ghee", "Diyas", "Rice",
 //                 "Haldi and Kumkum", "Panchamrit", "Mango leaves", "Kalash", "Betel leaves",
 //                 "Betel nuts", "Red cloth"
-//             ]
+//             ],
+//             image: "navagraha_pooja.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Shrimad Bhagwat Saptah",
@@ -62,7 +68,8 @@
 //                 "Bhagwat Gita book", "Kalash", "Mango leaves", "Betel leaves", "Betel nuts",
 //                 "Rice", "Flowers", "Incense sticks", "Camphor", "Ghee", "Diyas", "Panchamrit",
 //                 "Haldi and Kumkum", "Fruits", "Sweets"
-//             ]
+//             ],
+//             image: "bhagwat_saptah.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Rudrabhishek Pooja",
@@ -72,7 +79,8 @@
 //                 "Betel nuts", "Incense sticks", "Camphor", "Ghee", "Diyas", "Sandalwood paste",
 //                 "Kumkum", "Haldi", "Fruits", "Sweets (especially milk-based)", "Kalash",
 //                 "Mango leaves"
-//             ]
+//             ],
+//             image: "rudrabhishek.jpg" // Changed from .png to .jpg
 //         },
 //         {
 //             name: "Antim Sanskar (Funeral Rites)",
@@ -86,7 +94,8 @@
 //                 "Sandalwood paste", "New clothes for the deceased", "Kusha grass",
 //                 "Pind Daan items (rice balls, black sesame seeds, and other offerings)",
 //                 "Water mixed with milk, curd, ghee, and honey"
-//             ]
+//             ],
+//             image: "antim_sanskar.jpg" // Changed from .png to .jpg
 //         }
 //     ];
 //

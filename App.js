@@ -18,8 +18,8 @@ const Stack = createStackNavigator();
 
 const App = () => {
     // useEffect(() => {
-    //     addPoojasToFirestore();
-    // }, []);
+    //      addPoojasToFirestore();
+    //  }, []);
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="AuthenticationScreen">
