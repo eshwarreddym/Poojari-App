@@ -1,5 +1,5 @@
 // BookingService.js
-import { collection, addDoc, updateDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 
 export const createBooking = async (panditId, slotId, poojaId, date) => {
@@ -9,7 +9,7 @@ export const createBooking = async (panditId, slotId, poojaId, date) => {
     }
 
     try {
-        await runTransaction(db, async (transaction) => {
+        const result = await runTransaction(db, async (transaction) => {
             const panditRef = doc(db, 'pandits', panditId);
             const panditDoc = await transaction.get(panditRef);
 
@@ -18,15 +18,16 @@ export const createBooking = async (panditId, slotId, poojaId, date) => {
             }
 
             const panditData = panditDoc.data();
-            const slot = panditData.slots.find(s => s.id === slotId);
+            const slotIndex = panditData.slots.findIndex(s => s.id === slotId);
 
-            if (!slot || slot.isBooked) {
+            if (slotIndex === -1 || panditData.slots[slotIndex].isBooked) {
                 throw new Error("Slot is not available");
             }
 
             // Create a new booking document
-            const bookingRef = collection(db, 'bookings');
-            const newBookingRef = await addDoc(bookingRef, {
+            const bookingRef = doc(collection(db, 'bookings'));
+
+            transaction.set(bookingRef, {
                 userId: user.uid,
                 panditId: panditId,
                 slotId: slotId,
@@ -37,16 +38,15 @@ export const createBooking = async (panditId, slotId, poojaId, date) => {
             });
 
             // Update the pandit's slot
-            transaction.update(panditRef, {
-                slots: panditData.slots.map(s =>
-                    s.id === slotId ? {...s, isBooked: true} : s
-                )
-            });
+            const updatedSlots = [...panditData.slots];
+            updatedSlots[slotIndex] = { ...updatedSlots[slotIndex], isBooked: true };
 
-            return newBookingRef;
+            transaction.update(panditRef, { slots: updatedSlots });
+
+            return bookingRef.id;
         });
 
-        return "Booking successful!";
+        return `Booking successful! Booking ID: ${result}`;
     } catch (error) {
         console.error("Error in booking:", error);
         throw error;

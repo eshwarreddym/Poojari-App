@@ -89,9 +89,17 @@ const BookingScreen = ({ route, navigation }) => {
 
             // Update pandit's availability
             const panditRef = doc(db, 'pandits', selectedPandit);
-            await updateDoc(panditRef, {
-                availableDates: FieldValue.arrayRemove(selectedDate)
-            });
+            const panditDoc = await getDoc(panditRef);
+            if (panditDoc.exists()) {
+                const currentDates = panditDoc.data().availableDates || [];
+                const updatedDates = currentDates.filter(date =>
+                    date.toDate().toDateString() !== new Date(selectedDate).toDateString()
+                );
+
+                await updateDoc(panditRef, {
+                    availableDates: updatedDates
+                });
+            }
 
             Alert.alert('Success', 'Booking successful! Booking ID: ' + newBookingRef.id);
             navigation.navigate('UserBookingsScreen');

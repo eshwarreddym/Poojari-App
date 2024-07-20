@@ -3,12 +3,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCMIX5IVsWYdsKyq8cZWOxncmRbIfzyqaY",
-  authDomain: "pooja-app-4a4e4.firebaseapp.com",
-  projectId: "pooja-app-4a4e4",
-  storageBucket: "pooja-app-4a4e4.appspot.com",
-  messagingSenderId: "423693630036",
-  appId: "1:423693630036:web:879c3240c966b9a54ccbc1"
+  apiKey: "AIzaSyAOk52bH4lbXt4SzeX5snuGRZPPfuLpaNc",
+  authDomain: "pooja-app-a6718.firebaseapp.com",
+  projectId: "pooja-app-a6718",
+  storageBucket: "pooja-app-a6718.appspot.com",
+  messagingSenderId: "865328475846",
+  appId: "1:865328475846:web:eb3900c66b6b476e68f1c7"
 };
 
 const app = initializeApp(firebaseConfig);

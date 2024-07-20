@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AuthenticationScreen from './screens/AuthenticationScreen';
@@ -15,11 +15,15 @@ import PanditBookingsScreen from './screens/PanditBookingsScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import PanditDashboardScreen from './screens/PanditDashboardScreen';
 import PanditAvailableDatesScreen from './screens/PanditAvailableDatesScreen';
-import PanditProfileScreen from './screens/PanditProfileScreen'; // Import PanditProfileScreen
+import PanditProfileScreen from './screens/PanditProfileScreen';
+//import addPoojasToFirestore from './data/addPoojaData';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+    // useEffect(() => {
+    //     addPoojasToFirestore();
+    // }, []);
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="AuthenticationScreen">

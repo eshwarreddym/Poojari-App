@@ -52,7 +52,7 @@ const UserBookingsScreen = () => {
                         <Text style={styles.bookingText}>Pooja: {item.poojaName}</Text>
                         <Text style={styles.bookingText}>Pandit: {item.panditName}</Text>
                         <Text style={styles.bookingText}>Date: {item.date.toDate().toLocaleDateString()}</Text>
-                        <Text style={styles.bookingText}>Time: {item.slotId}</Text>
+                        <Text style={styles.bookingText}>Time: {item.time}</Text>
                         <Text style={styles.bookingText}>Status: {item.status}</Text>
                     </View>
                 )}
