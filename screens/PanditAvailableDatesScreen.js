@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
@@ -17,7 +17,6 @@ const PanditAvailableDatesScreen = () => {
         const panditSnap = await getDoc(panditRef);
         if (panditSnap.exists()) {
             const dates = panditSnap.data().availableDates || [];
-            // Convert Firestore Timestamps to JavaScript Date objects
             const datesArray = dates.map(timestamp => timestamp.toDate());
             setAvailableDates(datesArray);
         }
@@ -25,18 +24,20 @@ const PanditAvailableDatesScreen = () => {
 
     const addAvailableDate = (event, selectedDate) => {
         setShowDatePicker(false);
-        if (selectedDate) {
+        if (selectedDate && !availableDates.some(date => date.toDateString() === selectedDate.toDateString())) {
             setAvailableDates([...availableDates, selectedDate]);
+        } else if (selectedDate) {
+            alert('This date is already added.');
         }
+    };
+
+    const removeDate = (dateToRemove) => {
+        setAvailableDates(availableDates.filter(date => date !== dateToRemove));
     };
 
     const saveAvailableDates = async () => {
         const panditRef = doc(db, "pandits", auth.currentUser.uid);
-
-        // Convert JavaScript Date objects to Firestore Timestamps
-        const datesTimestamps = availableDates.map(date => {
-            return new Date(date); // Convert Date to Firestore Timestamp
-        });
+        const datesTimestamps = availableDates.map(date => new Date(date));
 
         try {
             await updateDoc(panditRef, { availableDates: datesTimestamps });
@@ -53,7 +54,14 @@ const PanditAvailableDatesScreen = () => {
             <FlatList
                 data={availableDates}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text style={styles.dateItem}>{item.toDateString()}</Text>}
+                renderItem={({ item }) => (
+                    <View style={styles.dateItemContainer}>
+                        <Text style={styles.dateItem}>{item.toDateString()}</Text>
+                        <TouchableOpacity onPress={() => removeDate(item)} style={styles.removeButton}>
+                            <Text style={styles.removeButtonText}>Remove</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             />
             <Button title="Add Available Date" onPress={() => setShowDatePicker(true)} />
             {showDatePicker && (
@@ -73,15 +81,39 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        backgroundColor: '#fafafa',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: '#ff6f00',
+    },
+    dateItemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        shadowColor: '#ff6f00',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 2,
+        elevation: 1,
     },
     dateItem: {
         fontSize: 16,
-        marginBottom: 10,
+    },
+    removeButton: {
+        backgroundColor: '#ff6f00',
+        borderRadius: 5,
+        padding: 5,
+    },
+    removeButtonText: {
+        color: '#fff',
+        fontSize: 14,
     },
 });
 
