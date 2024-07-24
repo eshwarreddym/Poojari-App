@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, Alert, FlatList } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { collection, addDoc, updateDoc, doc, getDocs, getDoc } from 'firebase/firestore';
-import { auth, db, FieldValue } from '../firebaseConfig'; // Ensure FieldValue is imported correctly
+import { collection, addDoc, updateDoc, doc, getDocs, getDoc, query, where } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
 
 const BookingScreen = ({ route, navigation }) => {
     const { poojaId, panditId } = route.params;
@@ -14,6 +14,7 @@ const BookingScreen = ({ route, navigation }) => {
     const [pandits, setPandits] = useState([]);
     const [availableDates, setAvailableDates] = useState([]);
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+    const [bookedSlots, setBookedSlots] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,12 +43,12 @@ const BookingScreen = ({ route, navigation }) => {
             if (panditSnap.exists()) {
                 const panditData = panditSnap.data();
                 const dates = panditData.availableDates || [];
-                // Filter out past dates
                 const filteredDates = dates.filter(date => new Date(date.toDate()) > new Date());
                 setAvailableDates(filteredDates);
-                // Clear selected date and time slots when dates are fetched
                 setSelectedDate(null);
+                setAvailableTimeSlots([]);
                 setSelectedTime(null);
+                setBookedSlots([]);
             } else {
                 console.log('Pandit document not found');
             }
@@ -56,16 +57,44 @@ const BookingScreen = ({ route, navigation }) => {
         }
     };
 
+    const fetchBookedSlots = async (selectedPanditId, selectedDate) => {
+        try {
+            const bookingsRef = collection(db, 'bookings');
+            const q = query(
+                bookingsRef,
+                where('panditId', '==', selectedPanditId),
+                where('date', '==', selectedDate.toISOString().split('T')[0])
+            );
+            const snapshot = await getDocs(q);
+
+            const booked = snapshot.docs.map(doc => doc.data().time);
+            setBookedSlots(booked);
+        } catch (error) {
+            console.error('Error fetching booked slots:', error);
+        }
+    };
+
     const handlePanditChange = async (itemValue) => {
         setSelectedPandit(itemValue);
         await fetchAvailableDates(itemValue);
     };
 
-    const handleDateSelection = (date) => {
-        setSelectedDate(date);
-        // Here you would typically fetch available time slots for the selected date
-        // For this example, we'll use dummy time slots
-        setAvailableTimeSlots(['9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM']);
+    const handleDateSelection = async (date) => {
+        const jsDate = date.toDate();
+        setSelectedDate(jsDate);
+        await fetchBookedSlots(selectedPandit, jsDate);
+
+        // Generate time slots in 3-hour intervals
+        const slots = [];
+        for (let hour = 9; hour <= 21; hour += 3) {
+            const formattedHour = hour % 12 || 12;
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const slot = `${formattedHour}:00 ${period}`;
+            if (!bookedSlots.includes(slot)) {
+                slots.push(slot);
+            }
+        }
+        setAvailableTimeSlots(slots);
         setSelectedTime(null); // Clear selected time when a new date is selected
     };
 
@@ -80,20 +109,32 @@ const BookingScreen = ({ route, navigation }) => {
                 userId: auth.currentUser.uid,
                 panditId: selectedPandit,
                 poojaId: selectedPooja,
-                date: selectedDate,
+                date: selectedDate.toISOString().split('T')[0],
                 time: selectedTime,
                 status: 'pending'
             };
 
+            const existingBookingQuery = query(
+                collection(db, 'bookings'),
+                where('panditId', '==', selectedPandit),
+                where('date', '==', bookingData.date),
+                where('time', '==', selectedTime)
+            );
+
+            const existingBookingSnapshot = await getDocs(existingBookingQuery);
+            if (!existingBookingSnapshot.empty) {
+                Alert.alert('Error', 'This time slot is already booked.');
+                return;
+            }
+
             const newBookingRef = await addDoc(collection(db, 'bookings'), bookingData);
 
-            // Update pandit's availability
             const panditRef = doc(db, 'pandits', selectedPandit);
             const panditDoc = await getDoc(panditRef);
             if (panditDoc.exists()) {
                 const currentDates = panditDoc.data().availableDates || [];
                 const updatedDates = currentDates.filter(date =>
-                    date.toDate().toDateString() !== new Date(selectedDate).toDateString()
+                    new Date(date.toDate()).toDateString() !== selectedDate.toDateString()
                 );
 
                 await updateDoc(panditRef, {

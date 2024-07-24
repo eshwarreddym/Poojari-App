@@ -1,4 +1,3 @@
-// BookingService.js
 import { collection, addDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 
