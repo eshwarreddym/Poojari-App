@@ -1,7 +1,10 @@
+// PanditLoginScreen.js
+
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, ImageBackground } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 const PanditLoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -10,8 +13,19 @@ const PanditLoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('PanditDashboardScreen'); // Changed from PanditBookingsScreen
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Check if the user is a pandit
+      const panditDoc = await getDoc(doc(db, 'pandits', user.uid));
+      if (panditDoc.exists()) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'PanditDashboardScreen' }],
+        });
+      } else {
+        setErrorMessage('This account is not registered as a pandit.');
+      }
     } catch (error) {
       setErrorMessage(error.message);
     }
