@@ -4,8 +4,15 @@ import { Picker } from '@react-native-picker/picker';
 import { collection, addDoc, doc, getDocs, getDoc, query, where } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 
+// Function to extract unique cities from pandit data
+const getUniqueCities = (pandits) => {
+    const cities = pandits.map(pandit => pandit.location);
+    return [...new Set(cities)]; // Return unique cities
+};
+
 const BookingScreen = ({ route, navigation }) => {
     const { poojaId, panditId } = route.params;
+    const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedPooja, setSelectedPooja] = useState(poojaId || null);
     const [selectedPandit, setSelectedPandit] = useState(panditId || null);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -14,26 +21,41 @@ const BookingScreen = ({ route, navigation }) => {
     const [pandits, setPandits] = useState([]);
     const [availableDates, setAvailableDates] = useState([]);
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+    const [cityOptions, setCityOptions] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!poojaId) {
-                const poojasSnapshot = await getDocs(collection(db, 'poojas'));
-                const poojaList = poojasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setPoojas(poojaList);
-            }
-            if (!panditId) {
-                const panditsSnapshot = await getDocs(collection(db, 'pandits'));
-                const panditList = panditsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setPandits(panditList);
-            }
-            if (panditId) {
-                await fetchAvailableDates(panditId);
-            }
+            // Fetch poojas
+            const poojasSnapshot = await getDocs(collection(db, 'poojas'));
+            const poojaList = poojasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setPoojas(poojaList);
+
+            // Fetch pandits
+            const panditsSnapshot = await getDocs(collection(db, 'pandits'));
+            const panditList = panditsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setPandits(panditList);
+
+            // Extract unique cities from pandit data
+            const cities = getUniqueCities(panditList);
+            setCityOptions(cities);
         };
 
         fetchData();
-    }, [poojaId, panditId]);
+    }, []);
+
+    useEffect(() => {
+        if (selectedLocation) {
+            const fetchPanditsByLocation = async () => {
+                const panditsRef = collection(db, 'pandits');
+                const panditQuery = query(panditsRef, where('location', '==', selectedLocation));
+                const panditsSnapshot = await getDocs(panditQuery);
+                const panditList = panditsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setPandits(panditList);
+            };
+
+            fetchPanditsByLocation();
+        }
+    }, [selectedLocation]);
 
     const fetchAvailableDates = async (selectedPanditId) => {
         try {
@@ -84,6 +106,10 @@ const BookingScreen = ({ route, navigation }) => {
         }
     };
 
+    const handleLocationChange = (itemValue) => {
+        setSelectedLocation(itemValue);
+    };
+
     const handlePanditChange = async (itemValue) => {
         setSelectedPandit(itemValue);
         await fetchAvailableDates(itemValue);
@@ -124,7 +150,18 @@ const BookingScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            {!poojaId && (
+            <Text style={styles.label}>Select Location:</Text>
+            <Picker
+                selectedValue={selectedLocation}
+                onValueChange={handleLocationChange}
+            >
+                <Picker.Item label="Select a Location" value={null} />
+                {cityOptions.map((city, index) => (
+                    <Picker.Item key={index} label={city} value={city} />
+                ))}
+            </Picker>
+
+            {selectedLocation && !poojaId && (
                 <View>
                     <Text style={styles.label}>Select Pooja:</Text>
                     <Picker
@@ -138,7 +175,7 @@ const BookingScreen = ({ route, navigation }) => {
                     </Picker>
                 </View>
             )}
-            {!panditId && (
+            {selectedLocation && !panditId && (
                 <View>
                     <Text style={styles.label}>Select Pandit:</Text>
                     <Picker
@@ -152,17 +189,21 @@ const BookingScreen = ({ route, navigation }) => {
                     </Picker>
                 </View>
             )}
-            <Text style={styles.label}>Select Date:</Text>
-            <FlatList
-                data={availableDates}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                    <Button
-                        title={new Date(item.toDate()).toDateString()}
-                        onPress={() => handleDateSelection(item)}
+            {selectedPandit && (
+                <>
+                    <Text style={styles.label}>Select Date:</Text>
+                    <FlatList
+                        data={availableDates}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            <Button
+                                title={new Date(item.toDate()).toDateString()}
+                                onPress={() => handleDateSelection(item)}
+                            />
+                        )}
                     />
-                )}
-            />
+                </>
+            )}
             {selectedDate && (
                 <>
                     <Text style={styles.label}>Select Time:</Text>
