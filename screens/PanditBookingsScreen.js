@@ -66,7 +66,7 @@ const PanditBookingsScreen = () => {
                         poojaId: data.poojaId,
                         status: data.status,
                         time: data.time,
-                        date: data.date ? data.date.toDate().toLocaleDateString() : 'No date',
+                        date: data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : 'Invalid date') : 'No date',
                     };
                 });
 
