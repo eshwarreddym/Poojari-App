@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ const UserSignupScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -21,6 +22,7 @@ const UserSignupScreen = ({ navigation }) => {
             await setDoc(doc(db, "users", user.uid), {
                 name: name,
                 email: email,
+                address: address,
                 role: 'user'
             });
 
@@ -33,70 +35,89 @@ const UserSignupScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <TextInput
-                style={styles.input}
-                placeholder="Name"
-                onChangeText={setName}
-                value={name}
-                placeholderTextColor="#888" // Placeholder text color
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                onChangeText={setEmail}
-                value={email}
-                placeholderTextColor="#888" // Placeholder text color
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                onChangeText={setPassword}
-                value={password}
-                secureTextEntry
-                placeholderTextColor="#888" // Placeholder text color
-            />
-            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-            {loading ? (
-                <ActivityIndicator size="large" color="#ff6f00" />
-            ) : (
-                <TouchableOpacity style={styles.button} onPress={handleSignup}>
-                    <Text style={styles.buttonText}>Sign Up</Text>
-                </TouchableOpacity>
-            )}
-        </View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Name"
+                    onChangeText={setName}
+                    value={name}
+                    placeholderTextColor="#888"
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    onChangeText={setEmail}
+                    value={email}
+                    placeholderTextColor="#888"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    onChangeText={setPassword}
+                    value={password}
+                    secureTextEntry
+                    placeholderTextColor="#888"
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Address"
+                    onChangeText={setAddress}
+                    value={address}
+                    placeholderTextColor="#888"
+                    multiline
+                />
+                {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+                {loading ? (
+                    <ActivityIndicator size="large" color="#ff6f00" />
+                ) : (
+                    <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                        <Text style={styles.buttonText}>Sign Up</Text>
+                    </TouchableOpacity>
+                )}
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fafafa',
+    },
+    scrollContainer: {
+        flexGrow: 1,
         justifyContent: 'center',
-        alignItems: 'center',
         padding: 16,
-        backgroundColor: '#fafafa', // Soft gray background
     },
     input: {
         width: '100%',
         padding: 12,
         marginVertical: 8,
         borderWidth: 1,
-        borderColor: '#ff6f00', // Orange border color
+        borderColor: '#ff6f00',
         borderRadius: 4,
+        backgroundColor: '#fff',
     },
     error: {
-        color: '#ff6f00', // Orange color for error text
+        color: '#ff6f00',
         marginVertical: 8,
     },
     button: {
-        backgroundColor: '#ff6f00', // Orange background for button
+        backgroundColor: '#ff6f00',
         borderRadius: 5,
         paddingVertical: 15,
         paddingHorizontal: 25,
         alignItems: 'center',
+        marginTop: 16,
     },
     buttonText: {
-        color: '#fff', // White text color for button
+        color: '#fff',
         fontSize: 16,
         fontWeight: '500',
     },

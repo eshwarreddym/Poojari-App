@@ -91,7 +91,10 @@ const PanditBookingsScreen = () => {
             userSnapshots.forEach(snapshot => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
-                    usersData[snapshot.id] = data.name || 'Unknown';
+                    usersData[snapshot.id] = {
+                        name: data.name || 'Unknown',
+                        address: data.address || 'No address provided'
+                    };
                 }
             });
 
@@ -140,7 +143,8 @@ const PanditBookingsScreen = () => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.bookingItem}>
-                        <Text style={styles.bookingText}>User Name: {users[item.userId] || 'Unknown'}</Text>
+                        <Text style={styles.bookingText}>User Name: {users[item.userId]?.name || 'Unknown'}</Text>
+                        <Text style={styles.bookingText}>User Address: {users[item.userId]?.address || 'No address provided'}</Text>
                         <Text style={styles.bookingText}>Pooja Name: {poojas[item.poojaId] || 'Unknown'}</Text>
                         <Text style={styles.bookingText}>Time: {item.time || 'N/A'}</Text>
                         <Text style={styles.bookingText}>Date: {item.date || 'N/A'}</Text>
