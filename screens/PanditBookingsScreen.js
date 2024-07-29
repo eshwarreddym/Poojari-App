@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, Modal } from 'react-native';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 import { Picker } from '@react-native-picker/picker';
 
@@ -66,13 +66,27 @@ const PanditBookingsScreen = () => {
                         poojaId: data.poojaId,
                         status: data.status,
                         time: data.time,
-                        date: data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : 'Invalid date') : 'No date',
+                        date: formatDate(data.date),
                     };
                 });
 
                 setBookings(bookingList);
                 await fetchUserAndPoojaData(bookingList);
             }
+        };
+
+        const formatDate = (date) => {
+            if (!date) return 'No date';
+            if (date instanceof Timestamp) {
+                return date.toDate().toLocaleDateString();
+            }
+            if (typeof date === 'string') {
+                return new Date(date).toLocaleDateString();
+            }
+            if (date.seconds) {
+                return new Date(date.seconds * 1000).toLocaleDateString();
+            }
+            return 'Invalid date';
         };
 
         const fetchUserAndPoojaData = async (bookingList) => {
@@ -147,7 +161,7 @@ const PanditBookingsScreen = () => {
                         <Text style={styles.bookingText}>User Address: {users[item.userId]?.address || 'No address provided'}</Text>
                         <Text style={styles.bookingText}>Pooja Name: {poojas[item.poojaId] || 'Unknown'}</Text>
                         <Text style={styles.bookingText}>Time: {item.time || 'N/A'}</Text>
-                        <Text style={styles.bookingText}>Date: {item.date || 'N/A'}</Text>
+                        <Text style={styles.bookingText}>Date: {item.date}</Text>
                         <Text style={styles.bookingText}>Status:</Text>
                         <IOSPicker
                             selectedValue={item.status}
